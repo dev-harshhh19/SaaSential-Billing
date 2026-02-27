@@ -21,20 +21,12 @@ public class UsageController {
   @PostMapping("/record")
   public ResponseEntity<ApiResponse<UsageRecord>> recordUsage(@Valid @RequestBody UsageRequest request) {
     UsageRecord record = usageService.recordUsage(request);
-    return ResponseEntity.ok(ApiResponse.<UsageRecord>builder()
-        .status(200)
-        .message("Usage recorded successfully")
-        .data(record)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Usage recorded successfully", record));
   }
 
   @GetMapping("/{subscriptionId}")
   public ResponseEntity<ApiResponse<List<UsageRecord>>> getUsage(@PathVariable Long subscriptionId) {
     List<UsageRecord> records = usageService.getUsageBySubscription(subscriptionId);
-    return ResponseEntity.ok(ApiResponse.<List<UsageRecord>>builder()
-        .status(200)
-        .message("Fetched usage successfully")
-        .data(records)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Fetched usage successfully", records));
   }
 }

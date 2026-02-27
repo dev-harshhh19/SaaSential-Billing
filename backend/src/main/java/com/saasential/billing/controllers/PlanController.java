@@ -21,36 +21,22 @@ public class PlanController {
 
   @GetMapping
   public ResponseEntity<ApiResponse<List<Plan>>> getAllPlans() {
-    // Anyone can view active plans, could add logic to separate if user is admin vs
-    // user
     List<Plan> plans = planService.getActivePlans();
-    return ResponseEntity.ok(ApiResponse.<List<Plan>>builder()
-        .status(200)
-        .message("Fetched plans successfully")
-        .data(plans)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Fetched plans successfully", plans));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/admin")
   public ResponseEntity<ApiResponse<List<Plan>>> getAllPlansAdmin() {
     List<Plan> plans = planService.getAllPlans();
-    return ResponseEntity.ok(ApiResponse.<List<Plan>>builder()
-        .status(200)
-        .message("Fetched all plans successfully")
-        .data(plans)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Fetched all plans successfully", plans));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ResponseEntity<ApiResponse<Plan>> createPlan(@Valid @RequestBody PlanRequest planRequest) {
     Plan createdPlan = planService.createPlan(planRequest);
-    return ResponseEntity.ok(ApiResponse.<Plan>builder()
-        .status(200)
-        .message("Plan created successfully")
-        .data(createdPlan)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Plan created successfully", createdPlan));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -58,20 +44,13 @@ public class PlanController {
   public ResponseEntity<ApiResponse<Plan>> updatePlan(@PathVariable Long id,
       @Valid @RequestBody PlanRequest planRequest) {
     Plan updatedPlan = planService.updatePlan(id, planRequest);
-    return ResponseEntity.ok(ApiResponse.<Plan>builder()
-        .status(200)
-        .message("Plan updated successfully")
-        .data(updatedPlan)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Plan updated successfully", updatedPlan));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse<Void>> deletePlan(@PathVariable Long id) {
     planService.deletePlan(id);
-    return ResponseEntity.ok(ApiResponse.<Void>builder()
-        .status(200)
-        .message("Plan deleted/deactivated successfully")
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Plan deleted/deactivated successfully"));
   }
 }

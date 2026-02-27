@@ -21,17 +21,9 @@ public class AuthController {
   public ResponseEntity<ApiResponse<AuthResponse>> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
     try {
       AuthResponse authResponse = authService.login(loginRequest);
-      return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
-          .status(200)
-          .message("Login successful")
-          .data(authResponse)
-          .build());
+      return ResponseEntity.ok(ApiResponse.success("Login successful", authResponse));
     } catch (Exception e) {
-      return ResponseEntity.badRequest().body(ApiResponse.<AuthResponse>builder()
-          .status(400)
-          .error("Authentication Failed")
-          .message(e.getMessage())
-          .build());
+      return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), "Authentication Failed"));
     }
   }
 
@@ -39,17 +31,9 @@ public class AuthController {
   public ResponseEntity<ApiResponse<AuthResponse>> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
     try {
       AuthResponse authResponse = authService.register(registerRequest);
-      return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
-          .status(200)
-          .message("Registration successful")
-          .data(authResponse)
-          .build());
+      return ResponseEntity.ok(ApiResponse.success("Registration successful", authResponse));
     } catch (Exception e) {
-      return ResponseEntity.badRequest().body(ApiResponse.<AuthResponse>builder()
-          .status(400)
-          .error("Registration Failed")
-          .message(e.getMessage())
-          .build());
+      return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), "Registration Failed"));
     }
   }
 }

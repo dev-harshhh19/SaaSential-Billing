@@ -52,4 +52,9 @@ After starting the application, navigate to:
 2. `http://localhost:8080/dashboard` to manage user subscriptions.
 3. `http://localhost:8080/admin` to observe system metrics.
 
+### 📚 API Documentation (Swagger)
+The backend REST API exposes live documentation endpoints dynamically generated via `springdoc-openapi` which is invaluable for production scale functional development:
+- **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) (Interactive Console)
+- **OpenAPI JSON:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs) (Raw Schema)
+
 Database: The data is saved safely in the `./backend/saasential_db.mv.db` local file.

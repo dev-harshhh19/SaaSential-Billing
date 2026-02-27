@@ -21,10 +21,6 @@ public class AdminDashboardController {
   @GetMapping
   public ResponseEntity<ApiResponse<DashboardMetrics>> getDashboardOverview() {
     DashboardMetrics metrics = adminAnalyticsService.getDashboardMetrics();
-    return ResponseEntity.ok(ApiResponse.<DashboardMetrics>builder()
-        .status(200)
-        .message("Fetched analytics successfully")
-        .data(metrics)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Fetched analytics successfully", metrics));
   }
 }

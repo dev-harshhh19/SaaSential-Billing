@@ -27,11 +27,7 @@ public class SubscriptionController {
       Authentication authentication) {
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     Subscription subscription = subscriptionService.createSubscription(userDetails.getId(), request);
-    return ResponseEntity.ok(ApiResponse.<Subscription>builder()
-        .status(200)
-        .message("Subscribed successfully")
-        .data(subscription)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Subscribed successfully", subscription));
   }
 
   @PutMapping("/{id}/upgrade")
@@ -39,30 +35,18 @@ public class SubscriptionController {
       @PathVariable Long id,
       @Valid @RequestBody SubscriptionRequest request) {
     Subscription subscription = subscriptionService.upgradeDowngradePlan(id, request);
-    return ResponseEntity.ok(ApiResponse.<Subscription>builder()
-        .status(200)
-        .message("Plan changed successfully")
-        .data(subscription)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Plan changed successfully", subscription));
   }
 
   @PutMapping("/{id}/cancel")
   public ResponseEntity<ApiResponse<Subscription>> cancelSubscription(@PathVariable Long id) {
     Subscription subscription = subscriptionService.cancelSubscription(id);
-    return ResponseEntity.ok(ApiResponse.<Subscription>builder()
-        .status(200)
-        .message("Subscription cancelled successfully")
-        .data(subscription)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Subscription cancelled successfully", subscription));
   }
 
   @GetMapping("/user/{userId}")
   public ResponseEntity<ApiResponse<List<Subscription>>> getUserSubscriptions(@PathVariable Long userId) {
     List<Subscription> subscriptions = subscriptionService.getUserSubscriptions(userId);
-    return ResponseEntity.ok(ApiResponse.<List<Subscription>>builder()
-        .status(200)
-        .message("Fetched user subscriptions successfully")
-        .data(subscriptions)
-        .build());
+    return ResponseEntity.ok(ApiResponse.success("Fetched user subscriptions successfully", subscriptions));
   }
 }
