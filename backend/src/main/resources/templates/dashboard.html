@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - SaaSential</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex text-indigo-600 font-bold text-xl items-center">
+          SaaSential Billing
+        </div>
+        <div class="flex items-center space-x-4">
+          <span id="userGreeting" class="text-gray-700 font-medium">Hello!</span>
+          <button onclick="logout()"
+            class="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- My Subscriptions -->
+    <section class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">My Subscriptions</h2>
+      <div id="subscriptionsContainer" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Data populated dynamically -->
+        <p class="text-gray-500 col-span-full">Loading your subscriptions...</p>
+      </div>
+    </section>
+
+    <!-- Available Plans -->
+    <section class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Available Plans</h2>
+      <div id="plansContainer" class="grid gap-6 md:grid-cols-3">
+        <!-- Data populated dynamically -->
+        <p class="text-gray-500 col-span-full">Loading available plans...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/';
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchUserSubscriptions();
+      fetchAvailablePlans();
+    });
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/';
+    }
+
+    async function fetchUserSubscriptions() {
+      try {
+        const response = await fetch('/api/v1/subscriptions', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        const container = document.getElementById('subscriptionsContainer');
+        container.innerHTML = '';
+
+        if (result.data && result.data.length > 0) {
+          result.data.forEach(sub => {
+            const div = document.createElement('div');
+            div.className = 'border border-gray-200 rounded p-4 flex flex-col justify-between';
+            div.innerHTML = `
+                            <div>
+                                <h3 class="font-bold text-lg text-indigo-600">${sub.plan.name}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Status: <span class="font-medium bg-green-100 text-green-800 px-2 py-1 rounded text-xs">${sub.status}</span></p>
+                                <p class="text-sm mt-3">Start Date: <span class="text-gray-800">${new Date(sub.startDate).toLocaleDateString()}</span></p>
+                                <p class="text-sm mt-1">End Date: <span class="text-gray-800">${new Date(sub.endDate).toLocaleDateString()}</span></p>
+                            </div>
+                            <div class="mt-4 space-x-2">
+                                <button onclick="cancelSubscription(${sub.id})" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded border border-red-200 hover:bg-red-200">Cancel</button>
+                            </div>
+                        `;
+            container.appendChild(div);
+          });
+        } else {
+          container.innerHTML = '<p class="text-gray-500 col-span-full">You do not have any active subscriptions.</p>';
+        }
+      } catch (err) {
+        console.error('Error fetching subscriptions', err);
+      }
+    }
+
+    async function fetchAvailablePlans() {
+      try {
+        const response = await fetch('/api/v1/plans', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        const container = document.getElementById('plansContainer');
+        container.innerHTML = '';
+
+        if (result.data && result.data.length > 0) {
+          result.data.forEach(plan => {
+            const div = document.createElement('div');
+            div.className = 'border border-indigo-100 shadow-sm rounded-lg p-6 bg-indigo-50 flex flex-col justify-between';
+            div.innerHTML = `
+                            <div>
+                                <h3 class="font-extrabold text-xl text-gray-900">${plan.name}</h3>
+                                <p class="text-3xl font-bold text-indigo-600 mt-2">$${plan.price} <span class="text-sm text-gray-500 font-normal">/${plan.billingCycle.toLowerCase()}</span></p>
+                                <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                                    <li>✔ ${plan.apiLimit} API Calls</li>
+                                    <li>✔ ${plan.storageLimit} GB Storage</li>
+                                    <li>✔ ${plan.trialDays} Days Trial</li>
+                                </ul>
+                            </div>
+                            <button onclick="subscribe(${plan.id})" class="mt-6 w-full bg-indigo-600 text-white font-medium py-2 rounded shadow hover:bg-indigo-700">Subscribe</button>
+                        `;
+            container.appendChild(div);
+          });
+        } else {
+          container.innerHTML = '<p class="text-gray-500 col-span-full">No active plans available right now.</p>';
+        }
+      } catch (err) {
+        console.error('Error fetching plans', err);
+      }
+    }
+
+    async function subscribe(planId) {
+      try {
+        const response = await fetch('/api/v1/subscriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ planId, autoRenew: true })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert('Successfully subscribed!');
+          fetchUserSubscriptions();
+        } else {
+          alert('Error: ' + result.message);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function cancelSubscription(subId) {
+      if (!confirm('Are you sure you want to cancel this subscription?')) return;
+      try {
+        const response = await fetch('/api/v1/subscriptions/' + subId + '/cancel', {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          alert('Subscription cancelled.');
+          fetchUserSubscriptions();
+        } else {
+          const result = await response.json();
+          alert('Error: ' + result.message);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+  </script>
+</body>
+
+</html>
