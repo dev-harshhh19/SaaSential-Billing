@@ -1,1 +1,28 @@
+# Java / Spring Boot
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Node / Frontend UI (If we add one later)
+node_modules/
+dist/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Project Docs
 /markdown
+*.log
+saasential_db*
+
+# Ignore any root level binaries accidentally downloaded
+*.class
+mssql-jdbc-*.jar
